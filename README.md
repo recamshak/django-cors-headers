@@ -40,36 +40,17 @@ Note that `CorsMiddleware` needs to come before Django's `CommonMiddleware` if y
 Add hosts that are allowed to do cross-site requests to `CORS_ORIGIN_WHITELIST` or set `CORS_ORIGIN_ALLOW_ALL` to `True` to allow all hosts.
 
 
->CORS\_ORIGIN\_ALLOW\_ALL: if True, the whitelist will not be used and all origins will be accepted
-
-    Default:
-
-        CORS_ORIGIN_ALLOW_ALL = False
-
->CORS\_ORIGIN\_WHITELIST: specify a list of origin hostnames that are authorized to make a cross-site HTTP request
+>CORS_ALLOW_ORIGIN: A list of tuples consisting of a regex pattern and a list of origin hosts or the string “*”
 
     Example:
-
-        CORS_ORIGIN_WHITELIST = (
-            'google.com',
-            'hostname.example.com'
+        CORS_ALLOW_ORIGIN = (
+            (r’^/api/account/.*$’, [‘https://app.example.com’, ‘https://app.example.fr’]),
+            (r’^/api/.*$’, ‘*’),
         )
 
-
     Default:
-
-        CORS_ORIGIN_WHITELIST = ()
-
->CORS\_ORIGIN\_REGEX\_WHITELIST: specify a regex list of origin hostnames that are authorized to make a cross-site HTTP request; Useful when you have a large amount of subdomains for instance.
-
-    Example:
-
-        CORS_ORIGIN_REGEX_WHITELIST = ('^(https?://)?(\w+\.)?google\.com$', )
-
-
-    Default:
-
-        CORS_ORIGIN_REGEX_WHITELIST = ()
+        
+        CORS_ALLOW_ORIGIN = ()
 
 
 ---
@@ -77,16 +58,6 @@ Add hosts that are allowed to do cross-site requests to `CORS_ORIGIN_WHITELIST` 
 
 You may optionally specify these options in settings.py to override the defaults. Defaults are shown below:
 
-
->CORS\_URLS\_REGEX: specify a URL regex for which to enable the sending of CORS headers; Useful when you only want to enable CORS for specific URLs, e. g. for a REST API under ``/api/``.
-
-    Example:
-
-        CORS_URLS_REGEX = r'^/api/.*$'
-
-    Default:
-
-        CORS_URLS_REGEX = '^.*$'
 
 >CORS\_ALLOW\_METHODS: specify the allowed HTTP methods that can be used when making the actual request
 
