@@ -37,9 +37,6 @@ Note that `CorsMiddleware` needs to come before Django's `CommonMiddleware` if y
 
 ## Configuration ##
 
-Add hosts that are allowed to do cross-site requests to `CORS_ORIGIN_WHITELIST` or set `CORS_ORIGIN_ALLOW_ALL` to `True` to allow all hosts.
-
-
 >CORS_ALLOW_ORIGIN: A list of tuples consisting of a regex pattern and a list of origin hosts or the string “*”
 
     Example:
@@ -49,7 +46,7 @@ Add hosts that are allowed to do cross-site requests to `CORS_ORIGIN_WHITELIST` 
         )
 
     Default:
-        
+
         CORS_ALLOW_ORIGIN = ()
 
 
@@ -57,33 +54,6 @@ Add hosts that are allowed to do cross-site requests to `CORS_ORIGIN_WHITELIST` 
 
 
 You may optionally specify these options in settings.py to override the defaults. Defaults are shown below:
-
-
->CORS\_ALLOW\_METHODS: specify the allowed HTTP methods that can be used when making the actual request
-
-    Default:
-
-        CORS_ALLOW_METHODS = (
-            'GET',
-            'POST',
-            'PUT',
-            'PATCH',
-            'DELETE',
-            'OPTIONS'
-        )
-
->CORS\_ALLOW\_HEADERS: specify which non-standard HTTP headers can be used when making the actual request
-
-    Default:
-
-        CORS_ALLOW_HEADERS = (
-            'x-requested-with',
-            'content-type',
-            'accept',
-            'origin',
-            'authorization',
-            'x-csrftoken'
-        )
 
 >CORS\_EXPOSE\_HEADERS: specify which HTTP headers are to be exposed to the browser
 

@@ -21,25 +21,20 @@ class CorsMiddleware(object):
             Django won't bother calling any other request view/exception middleware along with
             the requested view; it will call any response middlewares
         '''
-        if (request.method == 'OPTIONS' and
-            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' in request.META and
-            self.get_allowed_origins(request.path)):
-            response = http.HttpResponse()
-            return response
+        if self.is_preflight(request):
+            return http.HttpResponse()
+
         return None
+
 
     def process_response(self, request, response):
         '''
             Add the respective CORS headers
         '''
         origin = request.META.get('HTTP_ORIGIN')
-        if not origin:
-            return response
 
-        allowed_origins = self.get_allowed_origins(request.path)
-
-        if allowed_origins and (allowed_origins == "*" or origin in allowed_origins):
-            response[ACCESS_CONTROL_ALLOW_ORIGIN] = origin
+        if self.is_cors_allowed(request.path, origin):
+            response[ACCESS_CONTROL_ALLOW_ORIGIN] = origin or "*"
 
             if len(settings.CORS_EXPOSE_HEADERS):
                 response[ACCESS_CONTROL_EXPOSE_HEADERS] = ', '.join(settings.CORS_EXPOSE_HEADERS)
@@ -47,18 +42,27 @@ class CorsMiddleware(object):
             if settings.CORS_ALLOW_CREDENTIALS:
                 response[ACCESS_CONTROL_ALLOW_CREDENTIALS] = 'true'
 
-            if request.method == 'OPTIONS':
-                response[ACCESS_CONTROL_ALLOW_HEADERS] = ', '.join(settings.CORS_ALLOW_HEADERS)
-                response[ACCESS_CONTROL_ALLOW_METHODS] = ', '.join(settings.CORS_ALLOW_METHODS)
-                if settings.CORS_PREFLIGHT_MAX_AGE:
-                    response[ACCESS_CONTROL_MAX_AGE] = settings.CORS_PREFLIGHT_MAX_AGE
+            if request.META.get('HTTP_ACCESS_CONTROL_REQUEST_METHOD'):
+                response[ACCESS_CONTROL_ALLOW_METHODS] = request.META['HTTP_ACCESS_CONTROL_REQUEST_METHOD']
+
+            if request.META.get('HTTP_ACCESS_CONTROL_REQUEST_HEADERS'):
+                response[ACCESS_CONTROL_ALLOW_HEADERS] = request.META['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']
+
+            if request.method == 'OPTIONS' and settings.CORS_PREFLIGHT_MAX_AGE:
+                response[ACCESS_CONTROL_MAX_AGE] = settings.CORS_PREFLIGHT_MAX_AGE
 
         return response
 
 
-    def get_allowed_origins(self, path):
+    def is_preflight(self, request):
+        return (request.method == 'OPTIONS' and
+            'HTTP_ACCESS_CONTROL_REQUEST_METHOD' in request.META)
+
+
+    def is_cors_allowed(self, path, origin):
         for pattern, allowed_origins in settings.CORS_ALLOW_ORIGIN:
             if re.match(pattern, path):
-                return allowed_origins
+                return (allowed_origins == '*' or
+                        origin in allowed_origins)
 
-        return None
+        return False
